@@ -1,0 +1,90 @@
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <h2 class="font-bold text-slate-800">Assigned IP Addresses for {{ object.network_address }}</h2>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-300">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-slate-900 sm:pl-6">IP Address</th>
+                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Description</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Status</th>
+                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Action</th>
+                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">User</th>
+                
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white">
+                {% for ip in object.ipaddress_set.all %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 sm:pl-6">
+                        {{ ip.ip_address }}
+                    </td>
+
+                     <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+                        {{ ip.description|default:"--" }}
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                        {% if ip.status == 'used' or ip.get_status_display == 'used' %}
+                            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                                <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-green-500"></span>
+                                {{ ip.get_status_display }}
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                                <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-slate-400"></span>
+                                {{ ip.get_status_display }}
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+                        {% if ip.get_status_display == "used" %}
+                                <p>---<p>
+                        {% else %}
+                          
+                                <a href="{% url "ip_assign" ip.id%}">Assign</a>
+                        {% endif %}
+                        
+                    </td>
+                   
+
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+                        {{ ip.user.username|default:"--" }}
+                    </td>
+                   
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                        <div class="flex justify-end gap-3">
+                            <a href="{% url 'ip_update' ip.id %}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                            <a href="{% url 'ip_delete' ip.id %}" class="text-red-600 hover:text-red-900">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-6 py-12 text-center text-sm text-slate-500">
+                        <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 20l-5.447-2.724A2 2 0 013 15.483V4a2 2 0 012-2h10a2 2 0 012 2v5m2 2h2a2 2 0 012 2v8a2 2 0 01-2 2h-6a2 2 0 01-2-2v-2" />
+                        </svg>
+                        <p class="mt-2 font-medium">No IPs found</p>
+                        <p class="text-slate-400">Assign IP addresses to this subnet to see them here.</p>
+                    </td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+
+      
+   
+
+
+        
+      
+       
+    </div>
+</div>
+
+{% endblock  %}

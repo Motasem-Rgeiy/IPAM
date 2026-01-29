@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Subnet - {{ object.network_address }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto">
+    <div class="mb-8 border-b border-slate-200 pb-4">
+        <h1 class="text-2xl font-bold text-slate-800">Manage Subnet: <span class="text-indigo-600">{{ object.network_address }}</span></h1>
+        <p class="text-slate-500 text-sm mt-1">Update network settings and manage assigned IP addresses in one view.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <div class="lg:col-span-4 sticky top-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                    <h2 class="font-bold text-slate-800">Network Details</h2>
+                </div>
+                <form method="POST" class="p-6 space-y-4">
+                    {% csrf_token %}
+                    
+                    <div class="space-y-4 text-sm">
+                        {{ form.as_p }}
+                        
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">How many hosts do you want to generate ?</label>
+                            <input type="text" name="nums" value="{{request.POST.nums}}" 
+                                   placeholder="e.g. 10-50"
+                                   class="block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 text-sm">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex flex-col gap-2">
+                        <button type="submit" class="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm transition">
+                            Save Subnet Changes
+                        </button>
+                        <a href="{% url 'network_list' %}" class="w-full text-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+                            Back to List
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8">
+            {% include "ip/list_ip.html" %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ object.ip_address }}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[50vh]">
+    <div class="bg-white p-8 rounded-lg border border-slate-200 shadow-sm max-w-md w-full text-center">
+        
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Delete Subnet?</h2>
+        <p class="text-slate-600 mb-6">
+            Are you sure you want to remove <span class="font-semibold text-slate-900">{{ object.network_address }}</span>? 
+            This action cannot be undone.
+        </p>
+
+        <form method="POST" class="flex flex-col gap-3">
+            {% csrf_token %}
+            {{ form }} <button type="submit" class="w-full py-2.5 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition">
+                Confirm Delete
+            </button>
+            
+            <a href="{% url 'network_list' %}" class="w-full py-2.5 bg-slate-100 text-slate-700 font-medium rounded-md hover:bg-slate-200 transition">
+                Cancel
+            </a>
+        </form>
+        
+    </div>
+</div>
+{% endblock %}

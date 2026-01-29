@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Resource{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[50vh] px-4">
+    <div class="max-w-md w-full">
+        
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden text-center">
+            
+            <div class="p-8 pb-4">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 text-indigo-600 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold text-slate-800">Assign Resource</h1>
+                <p class="text-sm text-slate-500 mt-2">
+                    Please confirm the assignment details below to proceed.
+                </p>
+            </div>
+
+            <form method="POST" class="p-8 pt-4 space-y-6">
+                {% csrf_token %}
+
+                {% if form %}
+                <div class="text-left space-y-4">
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1">
+                            {{ field.label }}
+                        </label>
+                        <div class="[&>input]:block [&>input]:w-full [&>input]:rounded-lg [&>input]:border-slate-300 [&>input]:p-2.5 [&>input]:text-sm [&>input]:focus:border-indigo-500 [&>input]:focus:ring-indigo-500 [&>input]:border [&>select]:block [&>select]:w-full [&>select]:rounded-lg [&>select]:border-slate-300 [&>select]:p-2.5 [&>select]:text-sm">
+                            {{ field }}
+                        </div>
+                        {% if field.errors %}
+                            <p class="text-xs text-red-500 mt-1">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="flex flex-col gap-3">
+                    <button type="submit" class="w-full flex justify-center py-2.5 px-4 rounded-lg shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Confirm Assignment
+                    </button>
+                    
+                    <a href="javascript:history.back()" class="text-sm text-slate-500 hover:text-slate-800 transition-colors">
+                        Cancel and Go Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

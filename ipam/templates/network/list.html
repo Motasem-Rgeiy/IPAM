@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Subnets - IPAM{% endblock %}
+
+{% block content %}
+    <div class="sm:flex sm:items-center sm:justify-between mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Network Subnets</h1>
+            <p class="mt-2 text-sm text-slate-700">A comprehensive list of all defined network segments and CIDR blocks.</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:flex-none">
+            <a href="{% url "network_create" %}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto">
+                Add New Subnet
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-sm ring-1 ring-black ring-opacity-5 rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-300">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-slate-900 sm:pl-6">Network Address</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Name</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Description</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-slate-900">Last updated</th>
+                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                            <span class="sr-only">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 bg-white">
+                    {% for subnet in object_list %}
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-indigo-600 sm:pl-6">
+                            <a href="#" class="hover:underline">{{ subnet.network_address }}/{{ subnet.prefix }}</a>
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+                            {{ subnet.name|default:"No Name" }}
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500 font-mono">
+                             {{ subnet.description|default:"N/A" }}
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                
+                                <span class="text-xs text-slate-600">{{ subnet.updated_at|naturaltime }}</span>
+                            </div>
+                        </td>
+                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <div class="flex justify-end gap-3">
+                                 <a href="{% url "network_update" subnet.id%}" class="text-slate-400 hover:text-slate-600">Manage</a>
+                                <a href="{% url "network_delete" subnet.id %}" class="text-red-600 hover:text-indigo-900">Delete</a>
+                               
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="py-10 text-center text-sm text-slate-500 italic">
+                            No subnets found. Click "Add New Subnet" to get started.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

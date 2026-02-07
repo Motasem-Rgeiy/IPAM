@@ -1,10 +1,11 @@
-from django.shortcuts import render , get_object_or_404
+from django.shortcuts import render
 from django.views.generic import CreateView ,ListView , UpdateView , DeleteView
 from . import models , forms
 from django.urls import reverse_lazy , reverse
 import ipaddress
 from django.contrib.auth.mixins import LoginRequiredMixin , UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 
 @login_required
 def dashboard(request):
@@ -53,8 +54,8 @@ class NetworkUpdateView(LoginRequiredMixin,UpdateView):
     model = models.Network
     form_class = forms.NetowrkUpdateForm
     template_name = 'network/update.html'
-    def form_valid(self, form):
-        
+
+    def form_valid(self, form):    
         try:
             count = int(self.request.POST.get('nums' , ''))
         except ValueError:
@@ -62,6 +63,7 @@ class NetworkUpdateView(LoginRequiredMixin,UpdateView):
         net_obj = self.get_object().network_address
         prefix_obj = form.cleaned_data.get('prefix')
         current_net = ipaddress.ip_network(f"{net_obj}/{prefix_obj}" , strict=False)
+
         #Check overlap
         exist_networks = models.Network.objects.all()
         for net in exist_networks:
@@ -72,24 +74,27 @@ class NetworkUpdateView(LoginRequiredMixin,UpdateView):
                     return self.form_invalid(form)
         #Prevent update subnet length in case new subnet can not has more than existing hosts  
         count_DB_ips = models.IPAddress.objects.filter(network = self.get_object()).count()
-        count_updated_ips = len(list(current_net.hosts()))
+        count_updated_ips = current_net.num_addresses - 2
         if count_DB_ips > count_updated_ips:
             form.add_error('prefix' , 'This subnet has more than updated prefix can has!')
             return self.form_invalid(form)
+        
             
         instance = form.save()
-        target_ips = [str(ipaddress.ip_address(ip)) for ip in current_net.hosts()]
+        target_ips = [str(ipaddress.ip_address(ip)) for ip in current_net.hosts()] #solve this to have an ability to solve #2
         generated_ips = []
 
-        for host in target_ips:
+        excluded_ips = list(models.IPAddress.objects.filter(ip_address__in=target_ips))
+        excluded_ips = [ip.ip_address for ip in excluded_ips]
+        for host in target_ips: #2
                 if count == 0:
                     break
-                is_exist = models.IPAddress.objects.filter(ip_address__contains=host)
-                if is_exist:
+                if host in excluded_ips:
                     continue
                 generated_ips.append(models.IPAddress(ip_address=host , network=instance))
                 count-=1
-        models.IPAddress.objects.bulk_create(generated_ips)
+        with transaction.atomic():
+            models.IPAddress.objects.bulk_create(generated_ips)
         
         return super().form_valid(form)
         
@@ -137,7 +142,7 @@ class IPAddressDeleteView(LoginRequiredMixin,DeleteView):
     
 
 
-class IPAddressAssignView(UpdateView):
+class IPAddressAssignView(LoginRequiredMixin , UpdateView):
     model = models.IPAddress
     fields = []
     template_name = 'ip/assign_confirmation.html'

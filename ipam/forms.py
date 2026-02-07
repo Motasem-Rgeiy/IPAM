@@ -11,7 +11,7 @@ class NetowrkCreateForm(forms.ModelForm):
             'prefix':forms.Select(),
             'description':forms.Textarea()
         }
-
+'''
     def clean(self):
         cleaned_data = super().clean()
         new_network = cleaned_data.get('network_address' , '')
@@ -28,6 +28,7 @@ class NetowrkCreateForm(forms.ModelForm):
        
         
         return cleaned_data
+'''
     
 attrs = {'class': 'block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2',}
 class NetowrkUpdateForm(forms.ModelForm):
